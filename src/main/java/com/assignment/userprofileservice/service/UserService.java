@@ -45,7 +45,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // Map User entity to UserResponse DTO
     private UserResponse mapToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setUserId(user.getUserId());
@@ -57,5 +56,9 @@ public class UserService {
         response.setWeightKg(user.getWeightKg());
         response.setFitnessGoal(user.getFitnessGoal());
         return response;
+    }
+
+    public boolean isValidUser(UUID userId) {
+        return userRepository.existsById(userId);
     }
 }

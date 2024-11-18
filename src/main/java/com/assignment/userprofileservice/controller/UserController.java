@@ -32,4 +32,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @GetMapping("/validate/{userId}")
+    public ResponseEntity<Map<String, Boolean>> validateUser(@PathVariable UUID userId) {
+        boolean isValid = userService.isValidUser(userId);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("valid", isValid);
+        return ResponseEntity.ok(response);
+    }
+
 }
