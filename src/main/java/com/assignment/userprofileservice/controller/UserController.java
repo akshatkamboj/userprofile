@@ -65,6 +65,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
+    @GetMapping("/{userId}/logs")
+    public ResponseEntity<String> getUserTrackLogs(@PathVariable UUID userId) {
+        String response = userService.getUserTrackLogs(userId);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{userId}/logs")
     public ResponseEntity<Void> deleteUserTrackLogs(@PathVariable UUID userId) {
         userService.deleteUserTrackLogs(userId);

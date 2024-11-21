@@ -76,7 +76,7 @@ public class UserService {
         }
 
         String fitnessGoal = userOptional.get().getFitnessGoal();
-        String url = "http://localhost:3000/api/meal-plans/goals?goals=" + fitnessGoal;
+        String url = "https://44ce-2402-e280-3e64-84d-86d3-5942-8956-4c57.ngrok-free.app/api/meal-plans/goals?goals=" + fitnessGoal;
         return restTemplate.getForObject(url, String.class);
     }
 
@@ -87,7 +87,7 @@ public class UserService {
         }
 
         String fitnessGoal = userOptional.get().getFitnessGoal();
-        String url = "http://localhost:3030/api/workout-plans/goals?goals=" + fitnessGoal;
+        String url = "https://fast-vans-smash.loca.lt/api/plans/" + fitnessGoal;
         return restTemplate.getForObject(url, String.class);
     }
 
@@ -120,8 +120,20 @@ public class UserService {
         return mapToResponse(updatedUser);
     }
 
+    public String getUserTrackLogs(UUID userId) {
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        String fitnessGoal = userOptional.get().getFitnessGoal();
+        String url = "https://6628-2401-4900-1cb8-3e2-e872-4ecf-b3e5-2c8.ngrok-free.app/api/progress/summary/" + userId;
+        return restTemplate.getForObject(url, String.class);
+    }
+
     public void deleteUserTrackLogs(UUID userId) {
-        String url = "http://127.0.0.1:5000/api/progress/user/" + userId + "/logs";
+        String url = "https://6628-2401-4900-1cb8-3e2-e872-4ecf-b3e5-2c8.ngrok-free.app/api/progress/user/" + userId + "/logs";
 
         try {
             ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
