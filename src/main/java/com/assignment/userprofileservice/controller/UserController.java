@@ -40,4 +40,35 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{userId}/getNutritionPlan")
+    public ResponseEntity<String> getNutritionPlan(@PathVariable UUID userId) {
+        String response = userService.getNutritionPlanForUser(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{userId}/getWorkoutPlan")
+    public ResponseEntity<String> getWorkoutPlan(@PathVariable UUID userId) {
+        String response = userService.getWorkoutPlanForUser(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable UUID userId,
+            @RequestBody RegisterUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(userId, request));
+    }
+
+    @DeleteMapping("/{userId}/logs")
+    public ResponseEntity<Void> deleteUserTrackLogs(@PathVariable UUID userId) {
+        userService.deleteUserTrackLogs(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

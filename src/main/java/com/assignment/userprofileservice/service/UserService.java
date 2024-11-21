@@ -5,16 +5,23 @@ import com.assignment.userprofileservice.dto.UserResponse;
 import com.assignment.userprofileservice.model.User;
 import com.assignment.userprofileservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
 @Service
 public class UserService {
-
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private UserRepository userRepository;
 
@@ -61,4 +68,72 @@ public class UserService {
     public boolean isValidUser(UUID userId) {
         return userRepository.existsById(userId);
     }
+
+    public String getNutritionPlanForUser(UUID userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        String fitnessGoal = userOptional.get().getFitnessGoal();
+        String url = "http://localhost:3000/api/meal-plans/goals?goals=" + fitnessGoal;
+        return restTemplate.getForObject(url, String.class);
+    }
+
+    public String getWorkoutPlanForUser(UUID userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        String fitnessGoal = userOptional.get().getFitnessGoal();
+        String url = "http://localhost:3030/api/workout-plans/goals?goals=" + fitnessGoal;
+        return restTemplate.getForObject(url, String.class);
+    }
+
+    public void deleteUser(UUID userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        userRepository.deleteById(userId);
+    }
+
+    public UserResponse updateUser(UUID userId, RegisterUserRequest request) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        User user = userOptional.get();
+        // Update user details
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setAge(request.getAge());
+        user.setGender(request.getGender());
+        user.setHeightCm(request.getHeightCm());
+        user.setWeightKg(request.getWeightKg());
+        user.setFitnessGoal(request.getFitnessGoal());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        User updatedUser = userRepository.save(user);
+        return mapToResponse(updatedUser);
+    }
+
+    public void deleteUserTrackLogs(UUID userId) {
+        String url = "http://127.0.0.1:5000/api/progress/user/" + userId + "/logs";
+
+        try {
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("User track logs deleted successfully.");
+            } else {
+                throw new RuntimeException("Failed to delete user track logs, HTTP status: " + response.getStatusCode());
+            }
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Error while deleting user track logs: " + e.getMessage());
+        }
+    }
+
+
 }
